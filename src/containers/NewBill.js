@@ -15,10 +15,17 @@ export default class NewBill {
     this.fileName = null
     new Logout({ document, localStorage, onNavigate })
   }
+
   handleChangeFile = e => {
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
     const filePath = e.target.value.split(/\\/g)
     const fileName = filePath[filePath.length-1]
+
+    // add for checked file extension
+    const fileExtensionCheck = /(png|jpg|jpeg)/g;
+    const fileExtension = fileName.split(".").pop();
+    const fileMatchExtension = fileExtension.toLowerCase().match(fileExtensionCheck);
+
     this.firestore
       .storage
       .ref(`justificatifs/${fileName}`)
@@ -26,12 +33,22 @@ export default class NewBill {
       .then(snapshot => snapshot.ref.getDownloadURL())
       .then(url => {
         this.fileUrl = url
-        this.fileName = fileName
+        this.fileName = fileMatchExtension ? fileName : "invalid";
       })
   }
+
   handleSubmit = e => {
     e.preventDefault()
     console.log('e.target.querySelector(`input[data-testid="datepicker"]`).value', e.target.querySelector(`input[data-testid="datepicker"]`).value)
+    
+    // add for fileName extension error type
+    const inputFileExtension = document.querySelector(`input[data-testid="file"]`)
+    if (this.fileName === "invalid") {
+      inputFileExtension.classList.toggle('red-border')
+      document.querySelector('.error-extension').style.display = 'block'
+      return;
+    }
+
     const email = JSON.parse(localStorage.getItem("user")).email
     const bill = {
       email,

@@ -145,13 +145,13 @@ export default class {
       this.counter ++
     }
 
-    bills.forEach(bill => {
-      $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))
-    })
-
-    return bills
-
-  }
+    filteredBills(bills, getStatus(this.index)).forEach((bill) => {
+      $(`#open-bill${bill.id}`).click((e) =>
+          this.handleEditTicket(e, bill, bills)
+      )
+  })
+  return bills
+}
 
   // not need to cover this function by tests
   getBillsAllUsers = () => {
