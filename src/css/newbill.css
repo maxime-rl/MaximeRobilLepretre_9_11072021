@@ -16,10 +16,22 @@
 }
 
 .blue-border {
-  opacity: 0.5;
   border: 2px solid #0D5AE5 !important;
   box-sizing: border-box;
   border-radius: 5px;
+}
+
+.red-border {
+  opacity: 0.5;
+  border: 2px solid red !important;
+  box-sizing: border-box;
+  border-radius: 5px;
+}
+
+.error-extension {
+  display: none;
+  font-size: 12px;
+  color: red;
 }
 
 label {
