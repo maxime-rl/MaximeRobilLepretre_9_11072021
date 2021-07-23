@@ -1,4 +1,5 @@
 export const formatDate = (dateStr) => {
+  if (Date.parse(dateStr) === NaN || dateStr === "") return "01.01.21"; // Bug invalid dates in DB => replace invalid dates by other valid dates
   const date = new Date(dateStr)
   const ye = new Intl.DateTimeFormat('fr', { year: 'numeric' }).format(date)
   const mo = new Intl.DateTimeFormat('fr', { month: '2-digit' }).format(date)
