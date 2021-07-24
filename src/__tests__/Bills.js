@@ -5,7 +5,7 @@ import Bills from "../containers/Bills.js"
 import BillsUI from "../views/BillsUI.js"
 import { bills } from "../fixtures/bills.js"
 
-
+// Unit test
 describe("GIVEN i am connected as an employee", () => {
   describe("WHEN i am on bills Page and there are no bills", () => {
     test("THEN bills should be empty", () => {
@@ -26,6 +26,22 @@ describe("GIVEN i am connected as an employee", () => {
       const antiChrono = (a, b) => ((a < b) ? 1 : -1)
       const datesSorted = [...dates].sort(antiChrono)
       expect(dates).toEqual(datesSorted)
+    })
+    describe('WHEN i am on bills Page and there are bills but it is loading', () => {
+      test('THEN Loading page should be displayed', () => {
+        const html = BillsUI({ loading: true })
+        document.body.innerHTML = html
+
+        expect(screen.getAllByText('Loading...')).toBeTruthy()
+      })
+    })
+    describe('WHEN i am on bills Page and there are bills but back-end send an error message', () => {
+      test('THEN Error page should be displayed', () => {
+        const html = BillsUI({ error: 'some error message' })
+        document.body.innerHTML = html
+
+        expect(screen.getAllByText('Erreur')).toBeTruthy()
+      })
     })
     describe("WHEN I click on the button for create a new bill", () => {
       test("THEN the add billing note page should open", () => {
