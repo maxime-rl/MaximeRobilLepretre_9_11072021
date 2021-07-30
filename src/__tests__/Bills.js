@@ -1,28 +1,29 @@
 import { screen } from "@testing-library/dom"
 import  userEvent  from '@testing-library/user-event'
-import { ROUTES } from "../constants/routes"
+import { ROUTES, ROUTES_PATH } from "../constants/routes"
 import Bills from "../containers/Bills.js"
 import BillsUI from "../views/BillsUI.js"
 import { bills } from "../fixtures/bills.js"
 import firebase from "../__mocks__/firebase";
+import { localStorageMock } from "../__mocks__/localStorage.js";
 
 // Unit test
-describe("GIVEN i am connected as an employee", () => {
-  describe("WHEN i am on bills Page and there are no bills", () => {
+describe('GIVEN i am connected as an employee', () => {
+  describe('WHEN i am on bills Page and there are no bills', () => {
     test("THEN bills should be empty", () => {
       const html = BillsUI({ data: [] })
       document.body.innerHTML = html
 
-      const eyeIconElt = screen.queryByTestId("icon-eye")
+      const eyeIconElt = screen.queryByTestId('icon-eye')
       expect(eyeIconElt).toBeNull()
     })
   })
-  describe("WHEN i am on bills Page and there are bills", () => {
-    test("THEN bills should be ordered from earliest to latest", () => {
+  describe('WHEN i am on bills Page and there are bills', () => {
+    test('THEN bills should be ordered from earliest to latest', () => {
       const html = BillsUI({ data: bills })
       document.body.innerHTML = html
 
-      const dates = Array.from(document.body.querySelectorAll("#data-table tbody>tr>td:nth-child(3)")).map((a) => a.innerHTML)
+      const dates = Array.from(document.body.querySelectorAll('#data-table tbody>tr>td:nth-child(3)')).map((a) => a.innerHTML)
 
       const antiChrono = (a, b) => ((a < b) ? 1 : -1)
       const datesSorted = [...dates].sort(antiChrono)
@@ -44,14 +45,25 @@ describe("GIVEN i am connected as an employee", () => {
         expect(screen.getAllByText('Erreur')).toBeTruthy()
       })
     })
-    describe("WHEN i click on the button for create a new bill", () => {
-      test("THEN the add billing note page should open", () => {
+    describe('WHEN i click on the button for create a new bill', () => {
+      test('THEN the add billing note page should open', () => {
         const html = BillsUI({ data: bills })
         document.body.innerHTML = html
 
         const onNavigate = (pathname) => {
           document.body.innerHTML = ROUTES({ pathname })
         }
+
+        Object.defineProperty(window, 'localStorage', {
+          value: localStorageMock,
+        })
+
+        window.localStorage.setItem(
+          'user',
+          JSON.stringify({
+            type: 'Employee',
+          })
+        )
 
         const billsOnUI = new Bills({
           document,
@@ -86,14 +98,14 @@ describe("GIVEN i am connected as an employee", () => {
 
         $.fn.modal = jest.fn()
 
-        const iconEyeElt = screen.getAllByTestId("icon-eye")[0]
+        const iconEyeElt = screen.getAllByTestId('icon-eye')[0]
         const handleClickIconEye = jest.fn(() => billsOnUI.handleClickIconEye(iconEyeElt))
 
-        iconEyeElt.addEventListener("click", handleClickIconEye)
+        iconEyeElt.addEventListener('click', handleClickIconEye)
         userEvent.click(iconEyeElt)
         expect(handleClickIconEye).toHaveBeenCalled()
 
-        const modalElt = document.getElementById("modaleFile")
+        const modalElt = document.getElementById('modaleFile')
         expect(modalElt).toBeTruthy()
       })
     })
@@ -101,8 +113,8 @@ describe("GIVEN i am connected as an employee", () => {
 })
 
 // Integration test
-describe("GIVEN i am a user connected as Emplyee", () => {
-  describe("WHEN i navigate to bills pages", () => {
+describe('GIVEN i am a user connected as Emplyee', () => {
+  describe('WHEN i navigate to bills pages', () => {
     test('THEN fetches bills from mock API GET', async () => {
       const getSpy = jest.spyOn(firebase, 'get')
       const bills = await firebase.get()
