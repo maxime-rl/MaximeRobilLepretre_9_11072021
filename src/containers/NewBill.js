@@ -17,6 +17,7 @@ export default class NewBill {
   }
 
   handleChangeFile = e => {
+    e.preventDefault()
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
     const filePath = e.target.value.split(/\\/g)
     const fileName = filePath[filePath.length-1]
@@ -33,6 +34,7 @@ export default class NewBill {
       .then(snapshot => snapshot.ref.getDownloadURL())
       .then(url => {
         this.fileUrl = url
+        // add 'invalid' in fileName URL if wrong extension
         this.fileName = fileMatchExtension ? fileName : "invalid";
       })
   }
@@ -41,7 +43,7 @@ export default class NewBill {
     e.preventDefault()
     console.log('e.target.querySelector(`input[data-testid="datepicker"]`).value', e.target.querySelector(`input[data-testid="datepicker"]`).value)
     
-    // add for fileName extension error type
+    // add for fileName extension error type on UI
     const inputFileExtension = document.querySelector(`input[data-testid="file"]`)
     if (this.fileName === "invalid") {
       inputFileExtension.classList.toggle('red-border')
