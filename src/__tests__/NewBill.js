@@ -1,8 +1,10 @@
 import { screen, fireEvent } from "@testing-library/dom"
 import NewBillUI from "../views/NewBillUI.js"
 import NewBill from "../containers/NewBill.js"
-import { ROUTES } from "../constants/routes";
-import { localStorageMock } from "../__mocks__/localStorage.js";
+import { ROUTES } from "../constants/routes"
+import { localStorageMock } from "../__mocks__/localStorage.js"
+import firebase from '../__mocks__/firebase'
+import BillsUI from "../views/BillsUI.js"
 
 // Setup for test
 Object.defineProperty(window, 'localStorage', { 
@@ -56,7 +58,7 @@ describe('GIVEN i am connected as an employee', () => {
       expect(inputFile.files[0].name).toBe("image.jpg");
     });
   });
-  describe('When I am on NewBill Page and I Submit form with a file containing a valid extension', () => {
+  describe('WHEN I am on NewBill Page and I Submit form with a file containing a valid extension', () => {
     test('THEN I should be redirected to Bills page', () => {
       const html = NewBillUI()
       document.body.innerHTML = html
@@ -79,7 +81,7 @@ describe('GIVEN i am connected as an employee', () => {
       expect(screen.getAllByText('Mes notes de frais')).toBeTruthy()
     })
   })
-  describe('When I am on NewBill Page and I Submit form with a file containing a invalid extension', () => {
+  describe('WHEN I am on NewBill Page and I Submit form with a file containing a invalid extension', () => {
     test('THEN I should stay on the NewBill page and a error message should be displayed', () => {
       const html = NewBillUI()
       document.body.innerHTML = html
@@ -101,6 +103,46 @@ describe('GIVEN i am connected as an employee', () => {
       expect(handleSubmit).toHaveBeenCalled()
       expect(document.querySelector(".error-extension").style.display).toBe("block")
       expect(screen.getAllByText('Envoyer une note de frais')).toBeTruthy()
+    })
+  })
+})
+
+// START Integration test
+describe("GIVEN I am a user connected as an Employee", () => {
+  describe("WHEN I navigate to NewBill page and post a new bill", () => {
+    test("THEN it add a new bill on API with success", async () => {
+      const newBill = {
+        "id": "47qAXb6fIm2zOKkLzMro",
+        "vat": "80",
+        "fileUrl": "https://firebasestorage.googleapis.com/v0/b/billable-677b6.a…f-1.jpg?alt=media&token=c1640e12-a24b-4b11-ae52-529112e9602a",
+        "status": "pending",
+        "type": "Transports",
+        "commentary": "",
+        "name": "Car rent",
+        "fileName": "image.jpg",
+        "date": "2021-07-30",
+        "amount": 375,
+        "commentAdmin": "",
+        "email": "a@a",
+        "pct": 20
+      }
+
+      const postSpy = jest.spyOn(firebase, "post")
+      const bills = await firebase.post(newBill)
+
+      expect(postSpy).toHaveBeenCalledTimes(1)
+      expect(bills.data.length).toBe(5)
+    })
+    test("THEN it fails and returns an 500 message error on Bills page", async () => {
+      firebase.post.mockImplementationOnce(() =>
+        Promise.reject(new Error("Erreur 500"))
+      )
+
+      const html = BillsUI({ error: "Erreur 500" })
+      document.body.innerHTML = html
+      const message = screen.getByText(/Erreur 500/)
+
+      expect(message).toBeTruthy()
     })
   })
 })

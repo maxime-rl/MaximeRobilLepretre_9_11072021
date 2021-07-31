@@ -1,11 +1,11 @@
 import { screen } from "@testing-library/dom"
 import  userEvent  from '@testing-library/user-event'
-import { ROUTES, ROUTES_PATH } from "../constants/routes"
+import { ROUTES } from "../constants/routes"
 import Bills from "../containers/Bills.js"
 import BillsUI from "../views/BillsUI.js"
 import { bills } from "../fixtures/bills.js"
-import firebase from "../__mocks__/firebase";
-import { localStorageMock } from "../__mocks__/localStorage.js";
+import firebase from "../__mocks__/firebase"
+import { localStorageMock } from "../__mocks__/localStorage.js"
 
 // Setup for test
 Object.defineProperty(window, 'localStorage', { 
