@@ -1,13 +1,29 @@
 import { screen } from "@testing-library/dom"
 import  userEvent  from '@testing-library/user-event'
-import { ROUTES, ROUTES_PATH } from "../constants/routes"
+import { ROUTES } from "../constants/routes"
 import Bills from "../containers/Bills.js"
 import BillsUI from "../views/BillsUI.js"
 import { bills } from "../fixtures/bills.js"
-import firebase from "../__mocks__/firebase";
-import { localStorageMock } from "../__mocks__/localStorage.js";
+import firebase from "../__mocks__/firebase"
+import { localStorageMock } from "../__mocks__/localStorage.js"
 
-// Unit test
+// Setup for test
+Object.defineProperty(window, 'localStorage', { 
+  value: localStorageMock 
+})
+
+window.localStorage.setItem(
+  'user',
+  JSON.stringify({
+    type: 'Employee'
+  })
+)
+
+const onNavigate = (pathname) => {
+  document.body.innerHTML = ROUTES({ pathname });
+};
+
+// START Unit test
 describe('GIVEN i am connected as an employee', () => {
   describe('WHEN i am on bills Page and there are no bills', () => {
     test("THEN bills should be empty", () => {
@@ -50,21 +66,6 @@ describe('GIVEN i am connected as an employee', () => {
         const html = BillsUI({ data: bills })
         document.body.innerHTML = html
 
-        const onNavigate = (pathname) => {
-          document.body.innerHTML = ROUTES({ pathname })
-        }
-
-        Object.defineProperty(window, 'localStorage', {
-          value: localStorageMock,
-        })
-
-        window.localStorage.setItem(
-          'user',
-          JSON.stringify({
-            type: 'Employee',
-          })
-        )
-
         const billsOnUI = new Bills({
           document,
           onNavigate,
@@ -85,15 +86,11 @@ describe('GIVEN i am connected as an employee', () => {
         const html = BillsUI({ data: bills })
         document.body.innerHTML = html
 
-        const onNavigate = (pathname) => {
-          document.body.innerHTML = ROUTES({ pathname })
-        }
-
         const billsOnUI = new Bills({
             document,
             onNavigate,
             firestore: null,
-            localStorage: window.localStorage,
+            localStorage: window.localStorage
         })
 
         $.fn.modal = jest.fn()
@@ -112,7 +109,7 @@ describe('GIVEN i am connected as an employee', () => {
   })
 })
 
-// Integration test
+// START Integration test
 describe('GIVEN i am a user connected as Emplyee', () => {
   describe('WHEN i navigate to bills pages', () => {
     test('THEN fetches bills from mock API GET', async () => {
