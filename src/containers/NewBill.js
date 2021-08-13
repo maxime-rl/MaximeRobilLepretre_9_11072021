@@ -55,7 +55,6 @@ export default class NewBill {
 
     console.log('submitted file: ' + this.fileName);
 
-    // Just for unit test
     if (this.fileName === '') return null;
 
     const email = JSON.parse(localStorage.getItem('user')).email
@@ -72,8 +71,12 @@ export default class NewBill {
       fileName: this.fileName,
       status: 'pending'
     }
-    this.createBill(bill)
-    this.onNavigate(ROUTES_PATH['Bills'])
+
+    // To secure valid file submit
+    if (this.fileName != null) {
+      this.createBill(bill)
+      this.onNavigate(ROUTES_PATH['Bills'])
+    }
   }
 
   // not need to cover this function by tests
