@@ -145,6 +145,7 @@ export default class {
       this.counter ++
     }
 
+    // To fix the bug opening tickets in the list
     filteredBills(bills, getStatus(this.index)).forEach((bill) => {
       $(`#open-bill${bill.id}`).click((e) =>
           this.handleEditTicket(e, bill, bills)

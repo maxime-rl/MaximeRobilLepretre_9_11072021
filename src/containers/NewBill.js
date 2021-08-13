@@ -16,45 +16,49 @@ export default class NewBill {
     new Logout({ document, localStorage, onNavigate })
   }
 
-  handleChangeFile = e => {
-    e.preventDefault()
-    const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
-    const filePath = e.target.value.split(/\\/g)
-    const fileName = filePath[filePath.length-1]
+  handleChangeFile = (e) => {
+    document.querySelector(`input[data-testid="file"]`).classList.remove('red-border')
+    document.querySelector('.error-extension').style.display = 'none'
 
-    // add control for checked file extension
-    const fileExtensionCheck = /(png|jpg|jpeg)/g
-    const fileExtension = fileName.split(".").pop()
-    const fileMatchExtension = fileExtension.toLowerCase().match(fileExtensionCheck)
+		const file = this.document.querySelector(`input[data-testid="file"]`)
+			.files[0];
+		const filePath = e.target.value.split(/\\/g);
+		const fileName = filePath[filePath.length - 1];
 
-    this.handleStorageFile(fileName, file, fileMatchExtension)
-  }
+    // checking file extensions
+		if (
+			fileName.slice(-4).includes('.png') ||
+			fileName.slice(-4).includes('.jpg') ||
+			fileName.slice(-5).includes('.jpeg')
+		) {
+			this.firestore.storage
+				.ref(`justificatifs/${fileName}`)
+				.put(file)
+				.then((snapshot) => snapshot.ref.getDownloadURL())
+				.then((url) => {
+					this.fileUrl = url;
+					this.fileName = fileName;
+				});
+        console.log('extension checked: ' + fileName);
+		} else {
+			filePath.value = '';
+      
+      document.querySelector('.error-extension').style.display = 'block'
+      document.querySelector(`input[data-testid="file"]`).classList.add('red-border')
 
-  // add method for handle storage file
-  handleStorageFile = (fileName, file, fileMatchExtension) => {
-    if (this.firestore) {
-      this.firestore.storage
-        .ref(`justificatifs/${fileName}`)
-        .put(file)
-        .then((snapshot) => snapshot.ref.getDownloadURL())
-        .then((url) => {
-          this.fileUrl = url
-          this.fileName = fileMatchExtension ? fileName : "invalid"
-        })
-    }
-  }
+      console.log('extension error: ' + fileName);
+		}
+	};
 
   handleSubmit = e => {
     e.preventDefault()
-    // add UI information if fileName is invalid
-    const inputFileExtension = document.querySelector(`input[data-testid="file"]`)
-    if (this.fileName === "invalid") {
-      inputFileExtension.classList.toggle('red-border')
-      document.querySelector('.error-extension').style.display = 'block'
-      return
-    }
 
-    const email = JSON.parse(localStorage.getItem("user")).email
+    console.log('submitted file: ' + this.fileName);
+
+    // Just for unit test
+    if (this.fileName === '') return null;
+
+    const email = JSON.parse(localStorage.getItem('user')).email
     const bill = {
       email,
       type: e.target.querySelector(`select[data-testid="expense-type"]`).value,
