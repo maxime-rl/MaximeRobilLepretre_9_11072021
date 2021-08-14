@@ -32,29 +32,6 @@ describe('GIVEN i am connected as an employee', () => {
       expect(screen.getAllByText('Envoyer une note de frais')).toBeTruthy()
     })
   })
-  describe('When I am on NewBill Page and I submit form without file', () => {
-    test('THEN I should stay on the NewBill page', () => {
-      const html = NewBillUI();
-      document.body.innerHTML = html;
-
-      const newBill = new NewBill({
-        document,
-        onNavigate,
-        firestore: null,
-        localStorage: window.localStorage
-      });
-
-      const handleSubmit = jest.fn(newBill.handleSubmit)
-      newBill.fileName = ''
-
-      const submitBtnElt = screen.getByTestId('form-new-bill')
-      submitBtnElt.addEventListener('submit', handleSubmit)
-      fireEvent.submit(submitBtnElt)
-
-      expect(handleSubmit).toHaveBeenCalled()
-      expect(screen.getAllByText('Envoyer une note de frais')).toBeTruthy()
-    });
-  });
   describe('When I am on NewBill Page and I add a file', () => {
     test('Then this new file should be modified in the input file', () => {
       const html = NewBillUI();
@@ -82,7 +59,7 @@ describe('GIVEN i am connected as an employee', () => {
     });
   });
   describe('When I am on NewBill Page and I add a file containing a invalid extension', () => {
-    test('THEN I should stay on the NewBill page and a error message should be displayed', () => {
+    test('THEN a error message should be displayed', () => {
       const html = NewBillUI()
       document.body.innerHTML = html
 
@@ -105,6 +82,28 @@ describe('GIVEN i am connected as an employee', () => {
 
       expect(handleChangeFile).toHaveBeenCalled();
       expect(document.querySelector('.error-extension').style.display).toBe('block')
+    })
+  })
+  describe('WHEN I am on NewBill Page and I try to Submit form with a file containing a invalid extension', () => {
+    test('THEN I should stay on the NewBill page', () => {
+      const html = NewBillUI()
+      document.body.innerHTML = html
+
+      const newBill = new NewBill({
+        document,
+        onNavigate,
+        firestore: null,
+        localStorage: window.localStorage
+      });
+
+      const handleSubmit = jest.fn(newBill.handleSubmit)
+      newBill.fileName = ''
+
+      const submitBtnElt = screen.getByTestId('form-new-bill')
+      submitBtnElt.addEventListener('submit', handleSubmit)
+      fireEvent.submit(submitBtnElt)
+
+      expect(handleSubmit).toHaveBeenCalled()
       expect(screen.getAllByText('Envoyer une note de frais')).toBeTruthy()
     })
   })
